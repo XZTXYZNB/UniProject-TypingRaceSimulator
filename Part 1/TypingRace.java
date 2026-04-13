@@ -24,6 +24,10 @@ public class TypingRace
     private static final double MISTYPE_BASE_CHANCE = 0.3;
     private static final int    SLIDE_BACK_AMOUNT   = 2;
     private static final int    BURNOUT_DURATION     = 3;
+    
+    private boolean seat1Mistyped;
+    private boolean seat2Mistyped;
+    private boolean seat3Mistyped;
 
     /**
      * Constructor for objects of class TypingRace.
@@ -82,14 +86,19 @@ public class TypingRace
         // (Ty was in a hurry here)
         seat1Typist.resetToStart();
         seat2Typist.resetToStart();
-	seat3Typist.resetToStart();
+        seat3Typist.resetToStart();
 
         while (!finished)
         {
+            //Reset mistyped states
+            seat1Mistyped = false;
+            seat2Mistyped = false;
+            seat3Mistyped = false;
+            
             // Advance each typist by one turn
-            advanceTypist(seat1Typist);
-            advanceTypist(seat2Typist);
-            advanceTypist(seat3Typist);
+            advanceTypist(seat1Typist, 1);
+            advanceTypist(seat2Typist, 2);
+            advanceTypist(seat3Typist, 3);
 
             // Print the current state of the race
             printRace();
@@ -137,7 +146,7 @@ public class TypingRace
      *
      * @param theTypist the typist to advance
      */
-    private void advanceTypist(Typist theTypist)
+    private void advanceTypist(Typist theTypist, int seatNumber)
     {
         if (theTypist.isBurntOut())
         {
@@ -156,6 +165,16 @@ public class TypingRace
         if (Math.random() < (1 - theTypist.getAccuracy()) * MISTYPE_BASE_CHANCE)
         {
             theTypist.slideBack(SLIDE_BACK_AMOUNT);
+            
+            if (seatNumber == 1) {
+                seat1Mistyped = true;
+            }
+            if (seatNumber == 2) {
+                seat2Mistyped = true;
+            }
+            if (seatNumber == 3) {
+                seat3Mistyped = true;
+            }
         }
 
         // Burnout check — pushing too hard increases burnout risk
@@ -198,18 +217,18 @@ public class TypingRace
         multiplePrint('=', passageLength + 3);
         System.out.println();
 
-        printSeat(seat1Typist);
+        printSeat(seat1Typist, 1);
         System.out.println();
 
-        printSeat(seat2Typist);
+        printSeat(seat2Typist, 2);
         System.out.println();
 
-        printSeat(seat3Typist);
+        printSeat(seat3Typist, 3);
         System.out.println();
 
         multiplePrint('=', passageLength + 3);
         System.out.println();
-        System.out.println("  [zz] = burnt out    [<] = just mistyped");
+        System.out.println("  [~] = burnt out    [<] = just mistyped");
     }
 
     /**
@@ -224,10 +243,14 @@ public class TypingRace
      *
      * @param theTypist the typist whose lane to print
      */
-    private void printSeat(Typist theTypist)
+    private void printSeat(Typist theTypist, int seatNumber)
     {
         int spacesBefore = theTypist.getProgress();
         int spacesAfter  = passageLength - theTypist.getProgress();
+
+        if (spacesAfter < 0) {
+            spacesAfter = 0;
+        }
 
         System.out.print('|');
         multiplePrint(' ', spacesBefore);
@@ -239,6 +262,14 @@ public class TypingRace
         {
             System.out.print('~');
             spacesAfter--; // symbol + ~ together take two characters
+        }
+        
+        boolean mistyped = (seatNumber == 1 && seat1Mistyped)|| (seatNumber == 2 && seat2Mistyped)|| (seatNumber == 3 && seat3Mistyped);
+        
+        if (mistyped)
+        {
+            System.out.print("[<]");
+            spacesAfter -= 3;
         }
 
         multiplePrint(' ', spacesAfter);
