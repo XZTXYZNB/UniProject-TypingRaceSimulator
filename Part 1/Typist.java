@@ -1,22 +1,24 @@
 /**
- * Write a description of class Typist here.
+ * The class Typist represents a typing race competitor with accuracy, progress,
+ * and a temporary burnout state.
  *
  * Starter code generously abandoned by Ty Posaurus, your predecessor,
  * who typed with two fingers and considered that "good enough".
  * He left a sticky note: "the slide-back thing is optional probably".
  * It is not optional. Good luck.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Yuwen Zeng
+ * @version 1.0
  */
 public class Typist
 {
-    // Fields of class Typist
-    // Hint: you will need six fields. Think carefully about their types.
-    // One of them tracks how far along the passage the typist has reached.
-    // Another tracks whether the typist is currently burnt out.
-    // A third tracks HOW MANY turns of burnout remain (not just whether they are burnt out).
-    // The remaining three should be fairly obvious.
+    private String name;
+    private char symbol;
+    private int progress;
+    private boolean burnoutState;
+    private int burnoutTurnsRemaining;
+    private double accuracy;
+    
 
 
 
@@ -32,7 +34,9 @@ public class Typist
      */
     public Typist(char typistSymbol, String typistName, double typistAccuracy)
     {
-
+        this.symbol = typistSymbol;
+        this.name = typistName;
+        this.accuracy = typistAccuracy;
     }
 
 
@@ -46,7 +50,10 @@ public class Typist
      */
     public void burnOut(int turns)
     {
-
+        if (turns > 0) {
+            this.burnoutState = true;
+            this.burnoutTurnsRemaining = turns;
+        }
     }
 
     /**
@@ -56,7 +63,12 @@ public class Typist
      */
     public void recoverFromBurnout()
     {
+        this.burnoutTurnsRemaining--;
 
+        if (this.burnoutTurnsRemaining <= 0) {
+            this.burnoutState = false;
+            this.burnoutTurnsRemaining = 0;
+        }
     }
 
     /**
@@ -66,7 +78,7 @@ public class Typist
      */
     public double getAccuracy()
     {
-        return 0.0; // placeholder - replace with correct implementation
+        return this.accuracy; 
     }
 
     /**
@@ -78,7 +90,7 @@ public class Typist
      */
     public int getProgress()
     {
-        return 0; // placeholder - replace with correct implementation
+        return this.progress; 
     }
 
     /**
@@ -88,7 +100,7 @@ public class Typist
      */
     public String getName()
     {
-        return ""; // placeholder - replace with correct implementation
+        return this.name; 
     }
 
     /**
@@ -98,7 +110,7 @@ public class Typist
      */
     public char getSymbol()
     {
-        return ' '; // placeholder - replace with correct implementation
+        return this.symbol; 
     }
 
     /**
@@ -109,7 +121,10 @@ public class Typist
      */
     public int getBurnoutTurnsRemaining()
     {
-        return 0; // placeholder - replace with correct implementation
+        if (!this.burnoutState){
+            return 0;
+        }
+        return this.burnoutTurnsRemaining; 
     }
 
     /**
@@ -118,7 +133,9 @@ public class Typist
      */
     public void resetToStart()
     {
-
+        this.progress = 0;
+        this.burnoutState = false;
+        this.burnoutTurnsRemaining = 0;
     }
 
     /**
@@ -128,7 +145,7 @@ public class Typist
      */
     public boolean isBurntOut()
     {
-        return false; // placeholder - replace with correct implementation
+        return this.burnoutState; 
     }
 
     /**
@@ -137,7 +154,9 @@ public class Typist
      */
     public void typeCharacter()
     {
-
+        if (!this.burnoutState) {
+            this.progress++;
+        }
     }
 
     /**
@@ -148,7 +167,11 @@ public class Typist
      */
     public void slideBack(int amount)
     {
+        this.progress -= amount;
 
+        if (this.progress < 0) {
+            this.progress = 0;
+        }
     }
 
     /**
@@ -159,7 +182,15 @@ public class Typist
      */
     public void setAccuracy(double newAccuracy)
     {
-
+        this.accuracy = newAccuracy;
+        
+        if (this.accuracy <= 0.0) {
+            this.accuracy = 0.0;
+        }
+        
+        if (this.accuracy >= 1.0) {
+            this.accuracy = 1.0;
+        }
     }
 
     /**
@@ -169,7 +200,7 @@ public class Typist
      */
     public void setSymbol(char newSymbol)
     {
-
+        this.symbol = newSymbol;
     }
 
 }
