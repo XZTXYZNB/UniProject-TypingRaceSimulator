@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 /**
  * The class Typist represents a typing race competitor with accuracy, progress,
  * and a temporary burnout state.
@@ -12,8 +14,13 @@
  */
 public class Typist
 {
+    private String style;
+    private String keyboard;
+    private Color colour;
+    private String accessory;
+    
     private String name;
-    private char symbol;
+    private String symbol;
     private int progress;
     private boolean burnoutState;
     private int burnoutTurnsRemaining;
@@ -32,11 +39,16 @@ public class Typist
      * @param typistName    the name of the typist (e.g. "TURBOFINGERS")
      * @param typistAccuracy the typist's accuracy rating, between 0.0 and 1.0
      */
-    public Typist(char typistSymbol, String typistName, double typistAccuracy)
+    public Typist(String typistSymbol, String typistName, double typistAccuracy)
     {
         this.symbol = typistSymbol;
         this.name = typistName;
         this.accuracy = typistAccuracy;
+    
+        this.style = "";
+        this.keyboard = "";
+        this.colour = Color.GREEN;
+        this.accessory = "";
     }
 
 
@@ -69,6 +81,30 @@ public class Typist
             this.burnoutState = false;
             this.burnoutTurnsRemaining = 0;
         }
+    }
+    
+    /**
+     * Return the typing style.
+     */
+    public String getStyle()
+    {
+        return style;
+    }
+    
+    /**
+     * Return the keyboard type.
+     */
+    public String getKeyboard()
+    {
+        return keyboard;
+    }
+    
+    /**
+     * Return the accessory.
+     */
+    public String getAccessory()
+    {
+        return accessory;
     }
 
     /**
@@ -108,9 +144,29 @@ public class Typist
      *
      * @return the typist's symbol as a char
      */
-    public char getSymbol()
+    public String getSymbol()
     {
         return this.symbol; 
+    }
+    
+    /**
+     * Return speed multiplier according to the chosen keyboard type.
+     */
+    public double getSpeedMultiplier()
+    {
+        if (keyboard.equals("Mechanical")) {
+            return 1.2;
+        }
+    
+        if (keyboard.equals("Touchscreen")) {
+            return 0.8;
+        }
+    
+        if (keyboard.equals("Stenography")) {
+            return 1.5; 
+        }
+    
+        return 1.0;
     }
 
     /**
@@ -125,6 +181,14 @@ public class Typist
             return 0;
         }
         return this.burnoutTurnsRemaining; 
+    }
+    
+    /**
+     * Return the chosen colour.
+     */
+    public Color getColour()
+    {
+        return colour;
     }
 
     /**
@@ -198,9 +262,67 @@ public class Typist
      *
      * @param newSymbol the new symbol character
      */
-    public void setSymbol(char newSymbol)
+    public void setSymbol(String newSymbol)
     {
         this.symbol = newSymbol;
     }
 
+    /**
+     * Set variable style.
+     */
+    public void setStyle(String style)
+    {
+        this.style = style;
+        
+        if (style.equals("Touch Typist"))
+        {
+            this.accuracy += 0.15;
+        }
+        else if (style.equals("Hunt & Peck"))
+        {
+            this.accuracy -= 0.10;
+        }
+        else if (style.equals("Phone Thumbs"))
+        {
+            this.accuracy -= 0.05;
+        }
+        else if (style.equals("Voice-to-Text"))
+        {
+            this.accuracy += 0.20;
+        }
+    
+        if (this.accuracy > 1.0)
+        {
+            this.accuracy = 1.0;
+        }
+    
+        if (this.accuracy < 0.0)
+        {
+            this.accuracy = 0.0;
+        }
+    }
+    
+    /**
+     * Set variable keyboard.
+     */
+    public void setKeyboard(String keyboard)
+    {
+        this.keyboard = keyboard;
+    }
+    
+    /**
+     * Set variable color.
+     */
+    public void setColour(Color colour)
+    {
+        this.colour = colour;
+    }
+    
+    /**
+     * Set variable accessory.
+     */
+    public void setAccessory(String accessory)
+    {
+        this.accessory = accessory;
+    }
 }

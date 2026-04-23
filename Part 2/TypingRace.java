@@ -109,6 +109,17 @@ public class TypingRace
     private void advanceTypist(Typist theTypist, int seatNumber)
     {
         double acc = theTypist.getAccuracy();
+        
+        double progressRatio = (double) theTypist.getProgress() / passageLength;
+        
+        if (theTypist.getAccessory().equals("Energy Drink")){
+            if (progressRatio < 0.5) {
+                acc += 0.15;
+            }
+            else {
+                acc -= 0.10;
+            }
+        }
 
         if (nightShift)
         {
@@ -133,13 +144,20 @@ public class TypingRace
         }
 
         // Attempt to type a character
-        if (Math.random() < acc * speedMultiplier)
+        if (Math.random() < acc * speedMultiplier * theTypist.getSpeedMultiplier())
         {
             theTypist.typeCharacter();
         }
 
         // Mistype check — the probability should reflect the typist's accuracy
-        if (Math.random() < (1 - acc) * MISTYPE_BASE_CHANCE)
+        double mistypeChance = (1 - acc) * MISTYPE_BASE_CHANCE;
+
+        if (theTypist.getAccessory().equals("Headphones"))
+        {
+            mistypeChance *= 0.5;
+        }
+        
+        if (Math.random() < mistypeChance)
         {
             int slide = SLIDE_BACK_AMOUNT;
             
@@ -165,7 +183,14 @@ public class TypingRace
         
         if (Math.random() < burnoutChance)
         {
-            theTypist.burnOut(BURNOUT_DURATION);
+            int burnoutTurns = BURNOUT_DURATION;
+
+            if (theTypist.getAccessory().equals("Wrist Support"))
+            {
+                burnoutTurns = 1;
+            }
+            
+            theTypist.burnOut(burnoutTurns);
         }
     }
 

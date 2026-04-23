@@ -23,6 +23,8 @@ public class TypingRaceGUI extends JFrame
         }
 
         race = new TypingRace(passage, num);
+        
+        
 
         // Create typists
         for (int i = 0; i < num; i++)
@@ -33,9 +35,102 @@ public class TypingRaceGUI extends JFrame
                     JOptionPane.showInputDialog("Accuracy (0.0 - 1.0):")
             );
 
-            char symbol = (char)('①' + i); 
+            String symbol = JOptionPane.showInputDialog("Enter symbol or emoji for Typist " + (i + 1)); 
+            
+            //Choose typing style
+            String[] styles = {
+                "Touch Typist",
+                "Hunt & Peck",
+                "Phone Thumbs",
+                "Voice-to-Text"
+            };
+            
+            String style = (String) JOptionPane.showInputDialog(
+                null,
+                "Choose typing style:",
+                "Style",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                styles,
+                styles[0]
+            );
+            
+            //Choose keyboard type
+            String[] keyboards = {
+                "Mechanical",
+                "Membrane",
+                "Touchscreen",
+                "Stenography"
+            };
+            
+            String keyboard = (String) JOptionPane.showInputDialog(
+                null,
+                "Choose keyboard type:",
+                "Keyboard",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                keyboards,
+                keyboards[0]
+            );
+            
+            //Choose colour
+            String[] colours = {
+                "Red",
+                "Orange",
+                "Yellow",
+                "Green",
+                "Blue",
+            };
+            
+            String colourChoice = (String) JOptionPane.showInputDialog(
+                null,
+                "Choose colour:",
+                "Colour",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                colours,
+                colours[0]
+            );
+            
+            Color chosenColour = Color.RED;
+
+            if (colourChoice.equals("Orange")) {
+                chosenColour = Color.ORANGE;
+            }
+            else if (colourChoice.equals("Yellow")) {
+                chosenColour = Color.YELLOW;
+            }
+            else if (colourChoice.equals("Green")) {
+                chosenColour = Color.GREEN;
+            }
+            else if (colourChoice.equals("Blue")) {
+                chosenColour = Color.BLUE;
+            }
+            
+            
+            //Choose accessory
+            String[] accessories = {
+                "None",
+                "Wrist Support",
+                "Energy Drink",
+                "Headphones"
+            };
+            
+            String accessory = (String) JOptionPane.showInputDialog(
+                null,
+                "Choose accessory:",
+                "Accessory",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                accessories,
+                accessories[0]
+            );
 
             Typist t = new Typist(symbol, name, acc);
+            t.setAccessory(accessory);
+            t.setColour(chosenColour);
+            t.setStyle(style);
+            t.setKeyboard(keyboard);
 
             race.addTypist(t, i + 1);
         }
@@ -44,7 +139,8 @@ public class TypingRaceGUI extends JFrame
         int cf = JOptionPane.showConfirmDialog(null, "Enable Caffeine Mode?");
         int ns = JOptionPane.showConfirmDialog(null, "Enable Night Shift?");
         race.setModifiers(ac == 0, cf == 0, ns == 0);
-
+        
+        //Starting point
         race.startRace();
 
         // UI
