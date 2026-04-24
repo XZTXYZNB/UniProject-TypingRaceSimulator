@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.ArrayList;
 
 /**
  * The class Typist represents a typing race competitor with accuracy, progress,
@@ -25,10 +26,17 @@ public class Typist
     private boolean burnoutState;
     private int burnoutTurnsRemaining;
     private double accuracy;
+    private double oldAccuracy;
     
-
-
-
+    private int mistypeCount;
+    private int burnoutCount;
+    private int correctKeystrokes;
+    private long startTime;
+    private long finishTime;
+    
+    private double bestWPM = 0;
+    
+    private ArrayList<String> history = new ArrayList<String>();
 
     // Constructor of class Typist
     /**
@@ -65,6 +73,7 @@ public class Typist
         if (turns > 0) {
             this.burnoutState = true;
             this.burnoutTurnsRemaining = turns;
+            this.burnoutCount++;
         }
     }
 
@@ -200,6 +209,11 @@ public class Typist
         this.progress = 0;
         this.burnoutState = false;
         this.burnoutTurnsRemaining = 0;
+        this.mistypeCount = 0;
+        this.burnoutCount = 0;
+        this.correctKeystrokes = 0;
+        this.startTime = System.currentTimeMillis();
+        this.oldAccuracy = this.accuracy;
     }
 
     /**
@@ -220,6 +234,7 @@ public class Typist
     {
         if (!this.burnoutState) {
             this.progress++;
+            this.correctKeystrokes++;
         }
     }
 
@@ -231,11 +246,141 @@ public class Typist
      */
     public void slideBack(int amount)
     {
+        this.mistypeCount++;
         this.progress -= amount;
 
         if (this.progress < 0) {
             this.progress = 0;
         }
+    }
+    
+    /**
+     * Record fisish time.
+     */
+    public void finishRace()
+    {
+        this.finishTime = System.currentTimeMillis();
+    }
+    
+    public void updateAccuracyAfterRace()
+    {
+        double percent = getAccuracyPercent();
+    
+        if (percent >= 90) {
+            this.accuracy += 0.02;
+        }
+        else if (percent <= 70) {
+            this.accuracy -= 0.02;
+        }
+    
+        if (this.accuracy > 1.0) {
+            this.accuracy = 1.0;
+        }
+    
+        if (this.accuracy < 0.0) {
+            this.accuracy = 0.0;
+        }
+    }
+    
+    /**
+     * Update the best personal record.
+     */
+    public void updateBestWPM(int passageLength)
+    {
+        double current = getWPM(passageLength);
+    
+        if (current > bestWPM) {
+            bestWPM = current;
+        }
+    }
+    
+    /**
+     * Add race record.
+     */
+    public void addRaceHistory(int position, int passageLength)
+    {
+        String record =
+            "Position: " + position +
+            " | WPM: " + String.format("%.1f", getWPM(passageLength)) +
+            " | Accuracy: " + String.format("%.1f", getAccuracyPercent()) + "%" +
+            " | Burnouts: " + burnoutCount;
+    
+        history.add(record);
+    }
+    
+    /**
+     * Calculate words per minute.
+     */
+    public double getWPM(int passageLength)
+    {
+        long endTime;
+    
+        if (finishTime > 0)
+        {
+            endTime = finishTime;
+        }
+        else
+        {
+            endTime = System.currentTimeMillis();
+        }
+    
+        double minutes = (endTime - startTime) / 60000.0;
+    
+        if (minutes <= 0)
+        {
+            return 0;
+        }
+    
+        double words = progress / 5.0;
+    
+        return words / minutes;
+    }
+    
+    /**
+     * Calculate accuracy percentage.
+     */
+    public double getAccuracyPercent()
+    {
+        int total = correctKeystrokes + mistypeCount;
+    
+        if (total == 0)
+        {
+            return 100.0;
+        }
+    
+        return (correctKeystrokes * 100.0) / total;
+    }
+    
+    /**
+     * Return number of times the typist burnt out.
+     */
+    public int getBurnoutCount()
+    {
+        return burnoutCount;
+    }
+    
+    /**
+     * Return the change in accuracy.
+     */
+    public double getAccuracyChange()
+    {
+        return accuracy - oldAccuracy;
+    }
+    
+    /**
+     * Return personal best.
+     */
+    public double getBestWPM()
+    {
+        return bestWPM;
+    }
+    
+    /**
+     * Return race history.
+     */
+    public ArrayList<String> getHistory()
+    {
+        return history;
     }
 
     /**

@@ -89,7 +89,10 @@ public class TypingRace
             if (t == null) {
                 throw new IllegalStateException("Missing typist");
             }
-            t.resetToStart();
+            
+            if (t != null) {
+                t.resetToStart();
+            }
         }
     }
 
@@ -318,35 +321,53 @@ public class TypingRace
      */
     public void step() 
     {
-        if (caffeineTurns > 0)
-        {
+        if (caffeineTurns > 0) {
             caffeineTurns--;
         }
-        
+    
         if (finished) {
             return;
         }
     
-        // reset mistype flags
+        // reset flags
         for (int i = 0; i < typists.length; i++) {
             mistyped[i] = false;
         }
     
-        // advance all typists
+        // move typists
         for (int i = 0; i < typists.length; i++) {
-            if (typists[i] == null) {
-                continue;
+            if (typists[i] != null) {
+                advanceTypist(typists[i], i);
             }
-            
-            advanceTypist(typists[i], i);
         }
     
-        // check if finish
+        // check winner
         for (Typist t : typists) {
-            if (raceFinishedBy(t)) {
+            if (t != null && raceFinishedBy(t)) {
                 winner = t;
                 finished = true;
                 break;
+            }
+        }
+    
+        // ONLY ONCE when finished
+        if (finished) {
+            for (int i = 0; i < typists.length; i++) {
+                Typist ty = typists[i];
+    
+                if (ty == null) {
+                    continue;
+                }
+    
+                if (ty == winner) {
+                    ty.finishRace();
+                }
+                ty.updateAccuracyAfterRace();
+                ty.updateBestWPM(passageLength);
+    
+                int position = (ty == winner) ? 1 : i + 1;
+    
+                ty.addRaceHistory(position, passageLength);
             }
         }
     }

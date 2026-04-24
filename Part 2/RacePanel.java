@@ -10,7 +10,7 @@ public class RacePanel extends JPanel
     
     private int leftX = 50;
     private int baseY = 50;
-    private int rowGap = 80;
+    private int rowGap = 110;
 
     public RacePanel(TypingRace race)
     {
@@ -57,6 +57,16 @@ public class RacePanel extends JPanel
             g.setFont(new Font("Arial", Font.PLAIN, 12));
             g.setColor(Color.GRAY);
             g.drawString(getImpactText(t), leftX + 20, y + 18);
+            
+            // live metrics
+            g.setColor(Color.LIGHT_GRAY);
+            
+            String liveStats =
+                "WPM: " + String.format("%.1f", t.getWPM(race.getPassage().length())) +
+                "   ACC: " + String.format("%.1f", t.getAccuracyPercent()) + "%" +
+                "   BO: " + t.getBurnoutCount();
+            
+            g.drawString(liveStats, leftX + 20, y + 34);
     
             // typing
             g.setFont(typeFont);
@@ -64,12 +74,12 @@ public class RacePanel extends JPanel
             int textX = leftX + 50;
     
             g.setColor(t.getColour());
-            g.drawString(done, textX, y + 45);
+            g.drawString(done, textX, y + 65);
     
             g.setColor(Color.BLACK);
             g.drawString("█" + remaining,
                     textX + g.getFontMetrics(typeFont).stringWidth(done),
-                    y + 45);
+                    y + 65);
         }
     }
     
