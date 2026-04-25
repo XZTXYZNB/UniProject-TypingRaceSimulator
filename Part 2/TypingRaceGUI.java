@@ -13,6 +13,7 @@ public class TypingRaceGUI extends JFrame
     private JButton historyBtn;
     private JButton compareBtn;
     private JButton restartBtn;
+    private JButton leaderboardBtn;
     private boolean comparisonOn = false;
     private JScrollPane scroll;
     private Typist[] savedTypists;
@@ -22,7 +23,6 @@ public class TypingRaceGUI extends JFrame
         setupGame();
         setupFrame();
         setupUI();
-
         startTimer();
     }
 
@@ -36,12 +36,9 @@ public class TypingRaceGUI extends JFrame
      */
     private void setupGame()
     {
-        int num = Integer.parseInt(
-                JOptionPane.showInputDialog("Enter number of typists (2-6):"));
+        int num = Integer.parseInt(JOptionPane.showInputDialog("Enter number of typists (2-6):"));
     
-        int option = Integer.parseInt(
-                JOptionPane.showInputDialog(
-                        "Passage length (1:short 2:medium 3:long 4:custom)"));
+        int option = Integer.parseInt(JOptionPane.showInputDialog("Passage length (1:short 2:medium 3:long 4:custom)"));
     
         String passage;
     
@@ -178,7 +175,6 @@ public class TypingRaceGUI extends JFrame
         compareArea.setEditable(false);
         compareArea.setFont(new Font("Arial", Font.PLAIN, 14));
     
-        // IMPORTANT: use class field scroll, not local variable
         scroll = new JScrollPane(compareArea);
         scroll.setPreferredSize(new Dimension(250, 0));
         scroll.setVisible(false);
@@ -202,7 +198,9 @@ public class TypingRaceGUI extends JFrame
         historyBtn = new JButton("History");
         compareBtn = new JButton("Comparison OFF");
         restartBtn = new JButton("Restart");
-    
+        leaderboardBtn = new JButton("Leaderboard");
+
+        topBar.add(leaderboardBtn);
         topBar.add(restartBtn);
         topBar.add(bestBtn);
         topBar.add(historyBtn);
@@ -249,6 +247,7 @@ public class TypingRaceGUI extends JFrame
         historyBtn.addActionListener(e -> showHistory());
         compareBtn.addActionListener(e -> toggleComparison());
         restartBtn.addActionListener(e -> restartGame());
+        leaderboardBtn.addActionListener(e -> showLeaderboard());
     }
 
     /**
@@ -382,7 +381,6 @@ public class TypingRaceGUI extends JFrame
                 }
             }
             else {
-                // 新增人数位置 -> 新人
                 t = createTypist(i);
             }
     
@@ -398,5 +396,40 @@ public class TypingRaceGUI extends JFrame
     
         this.revalidate();
         this.repaint();
+    }
+    
+    /**
+     * Show the leader board.
+     */
+    private void showLeaderboard()
+    {
+        Typist[] list = race.getTypists().clone();
+    
+        for (int i = 0; i < list.length - 1; i++)
+        {
+            for (int j = i + 1; j < list.length; j++)
+            {
+                if (list[j].getTotalPoints() > list[i].getTotalPoints())
+                {
+                    Typist temp = list[i];
+                    list[i] = list[j];
+                    list[j] = temp;
+                }
+            }
+        }
+    
+        String text = "";
+    
+        for (int i = 0; i < list.length; i++)
+        {
+            text += (i + 1) + ". "
+                 + list[i].getName()
+                 + " - "
+                 + list[i].getTotalPoints()
+                 + " pts"
+                 + " [" + list[i].getTitle() + "]\n";
+        }
+    
+        JOptionPane.showMessageDialog(this, text);
     }
 }

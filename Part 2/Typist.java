@@ -27,6 +27,7 @@ public class Typist
     private int burnoutTurnsRemaining;
     private double accuracy;
     private double oldAccuracy;
+    private double baseAccuracy;
     
     private int mistypeCount;
     private int burnoutCount;
@@ -37,8 +38,12 @@ public class Typist
     private double bestWPM = 0;
     
     private ArrayList<String> history = new ArrayList<String>();
+    
+    private int totalPoints = 0;
+    private int consecutiveWins = 0;
+    private int noBurnoutStreak = 0;
+    private String title = "Rookie";
 
-    // Constructor of class Typist
     /**
      * Constructor for objects of class Typist.
      * Creates a new typist with a given symbol, name, and accuracy rating.
@@ -51,16 +56,13 @@ public class Typist
     {
         this.symbol = typistSymbol;
         this.name = typistName;
+        this.baseAccuracy = typistAccuracy;
         this.accuracy = typistAccuracy;
-    
         this.style = "";
         this.keyboard = "";
         this.colour = Color.GREEN;
         this.accessory = "";
     }
-
-
-    // Methods of class Typist
 
     /**
      * Sets this typist into a burnout state for a given number of turns.
@@ -214,6 +216,7 @@ public class Typist
         this.correctKeystrokes = 0;
         this.startTime = System.currentTimeMillis();
         this.oldAccuracy = this.accuracy;
+        this.accuracy = this.baseAccuracy;
     }
 
     /**
@@ -309,6 +312,34 @@ public class Typist
     }
     
     /**
+     * Accumulate award points.
+     */
+    public void awardPoints(int pts)
+    {
+        totalPoints += pts;
+        
+        if (totalPoints < 0) {
+            totalPoints = 0;
+        }
+    }
+    
+    /**
+     * Update title for typists.
+     */
+    public void updateTitle()
+    {
+        if (consecutiveWins >= 3)
+        {
+            title = "Speed Demon";
+        }
+    
+        if (noBurnoutStreak >= 5)
+        {
+            title = "Iron Fingers";
+        }
+    }
+    
+    /**
      * Calculate words per minute.
      */
     public double getWPM(int passageLength)
@@ -382,6 +413,53 @@ public class Typist
     {
         return history;
     }
+    
+    /**
+     * Return total points.
+     */
+    public int getTotalPoints()
+    {
+        return totalPoints;
+    }
+    
+    /**
+     * Return the title for the typist.
+     */
+    public String getTitle()
+    {
+        return title;
+    }
+    
+    /**
+     * Return accuracy for race.
+     */
+    public double getRaceAccuracy()
+    {
+        double acc = baseAccuracy;
+    
+        if (burnoutState)
+        {
+            acc -= 0.2;
+        }
+    
+        if (acc > 1.0) {
+            acc = 1.0;
+        }
+        
+        if (acc < 0.0) {
+            acc = 0.0;
+        }
+    
+        return acc;
+    }
+    
+    /**
+     * Return the base accuracy.
+     */
+    public double getBaseAccuracy()
+    {
+        return baseAccuracy;
+    }
 
     /**
      * Sets the accuracy rating of the typist.
@@ -418,32 +496,26 @@ public class Typist
     public void setStyle(String style)
     {
         this.style = style;
-        
-        if (style.equals("Touch Typist"))
-        {
-            this.accuracy += 0.15;
+    
+        if (style.equals("Touch Typist")) {
+            this.baseAccuracy += 0.15;
         }
-        else if (style.equals("Hunt & Peck"))
-        {
-            this.accuracy -= 0.10;
+        else if (style.equals("Hunt & Peck")) {
+            this.baseAccuracy -= 0.10;
         }
-        else if (style.equals("Phone Thumbs"))
-        {
-            this.accuracy -= 0.05;
+        else if (style.equals("Phone Thumbs")) {
+            this.baseAccuracy -= 0.05;
         }
-        else if (style.equals("Voice-to-Text"))
-        {
-            this.accuracy += 0.20;
+        else if (style.equals("Voice-to-Text")) {
+            this.baseAccuracy += 0.20;
         }
     
-        if (this.accuracy > 1.0)
-        {
-            this.accuracy = 1.0;
+        if (this.baseAccuracy > 1.0) {
+            this.baseAccuracy = 1.0;
         }
     
-        if (this.accuracy < 0.0)
-        {
-            this.accuracy = 0.0;
+        if (this.baseAccuracy < 0.0) {
+            this.baseAccuracy = 0.0;
         }
     }
     
@@ -469,5 +541,38 @@ public class Typist
     public void setAccessory(String accessory)
     {
         this.accessory = accessory;
+    }
+    
+    /**
+     * Set the base accuracy.
+     */
+    public void setBaseAccuracy(double acc)
+    {
+        this.baseAccuracy = acc;
+        this.accuracy = acc;
+    }
+    
+    /**
+     * Add number of wins.
+     */
+    public void addConsecutiveWin()
+    {
+        consecutiveWins++;
+    }
+    
+    /**
+     * Reset number of wins.
+     */
+    public void resetConsecutiveWins()
+    {
+        consecutiveWins = 0;
+    }
+    
+    /**
+     * Add number of burnout.
+     */
+    public void addNoBurnoutStreak()
+    {
+        noBurnoutStreak++;
     }
 }

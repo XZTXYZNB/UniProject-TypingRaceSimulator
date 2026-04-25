@@ -9,8 +9,8 @@ import java.lang.Math;
  * two-finger technique". He assured us the code was "basically done".
  * We have found evidence to the contrary.
  *
- * @author TyPosaurus
- * @version 0.7 (the other 0.3 is left as an exercise for the reader)
+ * @author TyPosaurus & Yuwen Zeng
+ * @version 1.4
  */
 public class TypingRace
 {
@@ -45,9 +45,7 @@ public class TypingRace
     public TypingRace(String passage, int number)
     {
         if (number < 2 || number > 6) {
-            throw new IllegalArgumentException(
-                "Number of typists must be between 2 and 6."
-            );
+            throw new IllegalArgumentException("Number of typists must be between 2 and 6.");
         }
         
         this.passage = passage;
@@ -68,7 +66,7 @@ public class TypingRace
             typists[seatNumber - 1] = theTypist;
         }
         else {
-            System.out.println("The seat number is invalid.");
+            throw new IllegalArgumentException("Seat number must be between 1 and " + typists.length);
         }
     }
 
@@ -82,6 +80,13 @@ public class TypingRace
      */
     public void startRace()
     {
+        Typist[] ranked = getRankedTypists();
+
+        // Reduce accuracy for first place from last round
+        if (ranked.length > 0){
+            ranked[0].setAccuracy(ranked[0].getAccuracy() - 0.03);
+        }
+        
         finished = false;
         winner = null;
 
@@ -111,7 +116,7 @@ public class TypingRace
      */
     private void advanceTypist(Typist theTypist, int seatNumber)
     {
-        double acc = theTypist.getAccuracy();
+        double acc = theTypist.getRaceAccuracy();
         
         double progressRatio = (double) theTypist.getProgress() / passageLength;
         
@@ -350,26 +355,86 @@ public class TypingRace
             }
         }
     
-        // ONLY ONCE when finished
+        // finished
         if (finished) {
-            for (int i = 0; i < typists.length; i++) {
-                Typist ty = typists[i];
-    
-                if (ty == null) {
+            Typist[] ranked = getRankedTypists();
+        
+            for (int i = 0; i < ranked.length; i++) {
+                Typist t = ranked[i];
+        
+                if (t == null) {
                     continue;
                 }
-    
-                if (ty == winner) {
-                    ty.finishRace();
+        
+                if (t == winner) {
+                    t.finishRace();
                 }
-                ty.updateAccuracyAfterRace();
-                ty.updateBestWPM(passageLength);
-    
-                int position = (ty == winner) ? 1 : i + 1;
-    
-                ty.addRaceHistory(position, passageLength);
+        
+                int pts = 0;
+        
+                if (i == 0) {
+                    pts = 3;
+                }
+                else if (i == 1) {
+                    pts = 2;
+                }
+                else if (i == 2) {
+                    pts = 1;
+                }
+        
+                // WPM bonus
+                if (t.getWPM(passageLength) >= 50) {
+                    pts += 1;
+                }
+        
+                // burnout penalty
+                if (t.getBurnoutCount() > 0) {
+                    pts -= 1;
+                }
+                else {
+                    t.addNoBurnoutStreak();
+                }
+        
+                // consecutive wins
+                if (i == 0) {
+                    t.addConsecutiveWin();
+
+                }
+                else {
+                    t.resetConsecutiveWins();
+                }
+        
+                t.awardPoints(pts);
+                t.updateTitle();
+                t.updateAccuracyAfterRace();
+                t.updateBestWPM(passageLength);
+                t.addRaceHistory(i + 1, passageLength);
             }
         }
+    }
+    
+    /**
+     * Return the rank of typist.
+     */
+    private Typist[] getRankedTypists()
+    {
+        Typist[] ranked = typists.clone();
+    
+        // Bubble sort
+        for (int i = 0; i < ranked.length - 1; i++)
+        {
+            for (int j = i + 1; j < ranked.length; j++)
+            {
+                if (ranked[j].getProgress() > ranked[i].getProgress())
+                {
+                    Typist temp = ranked[i];
+                    ranked[i] = ranked[j];
+                    ranked[j] = temp;
+                }
+            }
+        }
+    
+        return ranked;
     }
     
     /**
